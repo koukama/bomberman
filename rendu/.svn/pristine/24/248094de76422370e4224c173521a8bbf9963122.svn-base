@@ -1,0 +1,182 @@
+/*
+** gere_keyboard.c for bomberman in /home/infitek/Documents/Etna/Bomberman/rendu
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Fri Jun 29 10:19:44 2018 REBOUL Simon
+** Last update Fri Jun 29 11:44:40 2018 REBOUL Simon
+*/
+
+#include "functions.h"
+
+void	gere_keyboard(t_game *game, SDL_Event event)
+{
+  t_player	*player;
+  t_player	*player2;
+  int		index;
+  
+  for (index = 0; game->players[index]->id != game->this_player_index; index++);
+  player = game->players[index];
+  for (index = 0; game->players[index]->id != game->this_player_index + 1; index++);
+  player2 = game->players[index];
+   if (player->is_dead == 0)
+    {
+      switch( event.type ){
+      case SDL_MOUSEMOTION:
+	break;
+      case SDL_KEYDOWN:
+	switch( event.key.keysym.sym ){
+	case SDLK_x:
+	  if (event.key.repeat == 0 && player->actual_bombs < player->nb_bombs)
+	    add_bomb(game, player);
+	  break;
+	case SDLK_LEFT:
+	  if (player->is_sliding == 0 && player->position->pos->y + player->position->hitbox->h >=  0 && player->position->pos->y <= 13 * TILE_SIZE)
+	    {
+	      if (player->position->yvel == 0)
+		player->position->dir = 1;
+	      player->position->second_dir = 1;
+	      player->position->xvel = -(WALK_SPEED + player->speed);
+	    }
+	  break;
+	case SDLK_RIGHT:
+	  if (player->is_sliding == 0 && player->position->pos->y + player->position->hitbox->h  >=  0 && player->position->pos->y  <= 13 * TILE_SIZE)
+	    {
+	      if (player->position->yvel == 0)
+		player->position->dir = 3;
+	      player->position->second_dir = 3;
+	      player->position->xvel = (WALK_SPEED + player->speed);
+	    }
+	  break;
+	case SDLK_UP:
+	  if (player->is_sliding == 0 && player->position->pos->x >=  0 && player->position->pos->x <= 13 * TILE_SIZE)
+	    {
+	      if (player->position->xvel == 0)
+		player->position->dir = 5;
+	      player->position->second_dir = 5;
+	      player->position->yvel = -(WALK_SPEED + player->speed);
+	    }
+	  break;
+	case SDLK_DOWN:
+	  if (player->is_sliding == 0 && player->position->pos->x >=  0 && player->position->pos->x <= 13 * TILE_SIZE)
+	    {
+	      if (player->position->xvel == 0)
+		player->position->dir = 2;
+	      player->position->second_dir = 2;
+	      player->position->yvel = (WALK_SPEED + player->speed);
+	    }
+	  break;
+	default:
+	  break;
+	}
+	break;
+      case SDL_KEYUP:
+	switch( event.key.keysym.sym ){
+	case SDLK_LEFT:
+	  if( player->position->xvel < 0)
+	    player->position->xvel = 0;
+	  break;
+	case SDLK_RIGHT:
+	  if( player->position->xvel > 0)
+	    player->position->xvel = 0;
+	  break;
+	case SDLK_UP:
+	  if( player->position->yvel < 0)
+	    player->position->yvel = 0;
+	  break;
+	case SDLK_DOWN:
+	  if( player->position->yvel > 0)
+	    player->position->yvel = 0;
+	  break;
+	default:
+	  break;
+	}
+	break;
+	
+      default:
+	break;
+      }
+    }
+
+
+    if (player2->is_dead == 0)
+    {
+      switch( event.type ){
+      case SDL_MOUSEMOTION:
+	break;
+      case SDL_KEYDOWN:
+	switch( event.key.keysym.sym ){
+	case SDLK_m:
+	  if (event.key.repeat == 0 && player2->actual_bombs < player2->nb_bombs)
+	    add_bomb(game, player2);
+	  break;
+	case SDLK_q:
+	  if (player2->is_sliding == 0 && player2->position->pos->y + player2->position->hitbox->h >=  0 && player2->position->pos->y <= 13 * TILE_SIZE)
+	    {
+	      if (player2->position->yvel == 0)
+		player2->position->dir = 1;
+	      player2->position->second_dir = 1;
+	      player2->position->xvel = -(WALK_SPEED + player2->speed);
+	    }
+	  break;
+	case SDLK_d:
+	  if (player2->is_sliding == 0 && player2->position->pos->y + player2->position->hitbox->h  >=  0 && player2->position->pos->y  <= 13 * TILE_SIZE)
+	    {
+	      if (player2->position->yvel == 0)
+		player2->position->dir = 3;
+	      player2->position->second_dir = 3;
+	      player2->position->xvel = (WALK_SPEED + player2->speed);
+	    }
+	  break;
+	case SDLK_z:
+	  if (player2->is_sliding == 0 && player2->position->pos->x >=  0 && player2->position->pos->x <= 13 * TILE_SIZE)
+	    {
+	      if (player2->position->xvel == 0)
+		player2->position->dir = 5;
+	      player2->position->second_dir = 5;
+	      player2->position->yvel = -(WALK_SPEED + player2->speed);
+	    }
+	  break;
+	case SDLK_s:
+	  if (player2->is_sliding == 0 && player2->position->pos->x >=  0 && player2->position->pos->x <= 13 * TILE_SIZE)
+	    {
+	      if (player2->position->xvel == 0)
+		player2->position->dir = 2;
+	      player2->position->second_dir = 2;
+	      player2->position->yvel = (WALK_SPEED + player2->speed);
+	    }
+	  break;
+	default:
+	  break;
+	}
+	break;
+      case SDL_KEYUP:
+	switch( event.key.keysym.sym ){
+	case SDLK_q:
+	  if( player2->position->xvel < 0)
+	    player2->position->xvel = 0;
+	  break;
+	case SDLK_d:
+	  if( player2->position->xvel > 0)
+	    player2->position->xvel = 0;
+	  break;
+	case SDLK_z:
+	  if( player2->position->yvel < 0)
+	    player2->position->yvel = 0;
+	  break;
+	case SDLK_s:
+	  if( player2->position->yvel > 0)
+	    player2->position->yvel = 0;
+	  break;
+	default:
+	  break;
+	}
+	break;
+	
+      default:
+	break;
+      }
+    }
+   return;
+}

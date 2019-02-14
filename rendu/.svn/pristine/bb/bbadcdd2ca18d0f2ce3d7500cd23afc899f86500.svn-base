@@ -1,0 +1,83 @@
+/*
+** gere_intro.c for bomberman in /home/infitek/Documents/Etna/Bomberman/rendu
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Thu Jun 28 16:03:02 2018 REBOUL Simon
+** Last update Thu Jun 28 17:29:42 2018 REBOUL Simon
+*/
+
+#include "functions.h"
+
+void	gere_intro(t_game *game, SDL_Event event)
+{
+  int x = 0;
+  int y = 0;
+  int pressed = 0;
+  int index = 0;
+  char	*map_name;
+  
+  //SDL_GetMouseState(&x, &y);
+  if (SDL_GetMouseState(&x, &y) && SDL_BUTTON(1))
+    pressed = 1;
+  if (game->level_select == 0)
+    {
+      SDL_RenderCopy(game->screen, game->start_screen->bgTexture, NULL, NULL);
+      SDL_RenderCopy(game->screen, game->start_screen->clientButtonTexture, NULL, &game->start_screen->clientButton);
+      SDL_RenderCopy(game->screen, game->start_screen->masterButtonTexture, NULL, &game->start_screen->masterButton);
+      
+      if (x > game->start_screen->masterButton.x && x < (game->start_screen->masterButton.x + game->start_screen->masterButton.w)
+	  && y > game->start_screen->masterButton.y && y < (game->start_screen->masterButton.y + game->start_screen->masterButton.h))
+	{
+	  if (pressed == 1)
+	    {
+	      map_name = my_strcat("./maps/", game->level_previews[index]);
+	      map_name = my_strcat(map_name, ".png");
+	      
+	      game->level_select = 1;
+	      printf("Map name = %s\n", map_name);
+	      game->start_screen->levelPreviewSprite = IMG_Load(map_name);
+	      game->start_screen->levelPreviewTexture = SDL_CreateTextureFromSurface(game->screen, game->start_screen->levelPreviewSprite);
+	      game->start_screen->levelPreview.x = 80;
+	      game->start_screen->levelPreview.y = 60;
+	      game->start_screen->levelPreview.w = 300;
+	      game->start_screen->levelPreview.h = 250;
+	    }
+	}
+      else if (x > game->start_screen->clientButton.x && x < (game->start_screen->clientButton.x + game->start_screen->clientButton.w)
+	       && y > game->start_screen->clientButton.y && y < (game->start_screen->clientButton.y + game->start_screen->clientButton.h))
+	{
+	  if (pressed == 1)
+	    {
+	      printf("Not implemented yet\n");
+	    }
+	}
+    }
+  else
+    {
+      SDL_RenderCopy(game->screen, game->start_screen->levelSelectTexture, NULL, NULL);
+      SDL_RenderCopy(game->screen, game->start_screen->levelPreviewTexture, NULL, &game->start_screen->levelPreview);
+      SDL_RenderCopy(game->screen, game->start_screen->backButtonTexture, NULL, &game->start_screen->backButton);
+      SDL_RenderCopy(game->screen, game->start_screen->goButtonTexture, NULL, &game->start_screen->goButton);
+      SDL_RenderCopy(game->screen, game->start_screen->nextLevelButtonTexture, NULL, &game->start_screen->nextLevelButton);
+      SDL_RenderCopy(game->screen, game->start_screen->previousLevelButtonTexture, NULL, &game->start_screen->previousLevelButton);
+      if (x > game->start_screen->backButton.x && x < (game->start_screen->backButton.x + game->start_screen->backButton.w)
+	  && y > game->start_screen->backButton.y && y < (game->start_screen->backButton.y + game->start_screen->backButton.h))
+	{
+	  if (pressed == 1)
+	    {
+	      game->level_select = 0;
+	    }
+	}
+      else if (x > game->start_screen->goButton.x && x < (game->start_screen->goButton.x + game->start_screen->goButton.w)
+	  && y > game->start_screen->goButton.y && y < (game->start_screen->goButton.y + game->start_screen->goButton.h))
+	{
+	  if (pressed == 1)
+	    {
+	      game->level_select = 0;
+	      game->has_started = 1;
+	    }
+	}
+    }
+}

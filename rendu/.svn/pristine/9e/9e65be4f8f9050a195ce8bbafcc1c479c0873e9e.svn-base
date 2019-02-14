@@ -1,0 +1,173 @@
+/*
+** init_game.c for bomberman in /home/infitek/Documents/Etna/Bomberman
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Fri May  4 16:40:19 2018 REBOUL Simon
+** Last update Fri May 25 12:32:47 2018 REBOUL Simon
+*/
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include "bomberman.h"
+#include "functions.h"
+
+SDL_Renderer	*init_SDL(t_game *game)
+{
+  SDL_Window	*window;
+
+  if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 1024) == -1) //Initialisation de l'API Mixer
+    {
+      my_putstr("Error, cannot init Audio");
+    }
+  Mix_AllocateChannels(3);
+  if(TTF_Init() == -1)
+    {
+      my_putstr("Erreur d'initialisation de TTF_Init\n");
+      exit(EXIT_FAILURE);
+    }
+  game->police = TTF_OpenFont("./fonts/AnonymousPro.ttf", 30);
+  SDL_Init(SDL_INIT_VIDEO);
+  //screen = SDL_SetVideoMode(SCREEN_W, SCREEN_H, 32, SDL_SWSURFACE + SDL_RESIZABLE);
+  
+  //SDL_WM_SetCaption("Bomberman", NULL);
+  window = SDL_CreateWindow("Bomberman",
+			    SDL_WINDOWPOS_CENTERED,
+			    SDL_WINDOWPOS_CENTERED,
+			    SCREEN_W, SCREEN_H,
+			    SDL_WINDOW_OPENGL + 
+			    SDL_WINDOW_RESIZABLE);
+  SDL_Renderer *screen = SDL_CreateRenderer(window, -1, 0);
+  SDL_SetRenderDrawColor(screen, 0, 0, 0, 255);
+  //SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+  SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
+  SDL_RenderSetLogicalSize(screen, SCREEN_W, SCREEN_H);
+  SDL_RenderPresent(screen);
+  return screen;
+}
+
+void	init_game(t_game *game)
+{
+  char *map_name = "./maps/MapTest3";
+
+  game->background = IMG_Load("./images/map2.png");
+  if (!game->background)
+    {
+      fprintf(stderr, "Erreur Image : %s\n", IMG_GetError());
+    }
+  game->flames_sprite = IMG_Load("./images/Bombs.png");
+  game->flames_tex = SDL_CreateTextureFromSurface(game->screen, game->flames_sprite);
+  game->tileset = IMG_Load("./images/tiles2.png");
+  game->background_tex = SDL_CreateTextureFromSurface(game->screen, game->background);
+  game->tileset_tex = SDL_CreateTextureFromSurface(game->screen, game->tileset);
+  add_container_to_game(game);
+  init_player(game);
+  init_player(game);
+  init_player(game);
+  init_player(game);
+  load_map(game, my_strcat(map_name, "_sol.csv"), 0); // Layer 0 = Ground;
+  load_map(game, my_strcat(map_name, "_solid.csv"), 1); // Layer 1 = Solid objects;
+  load_map(game, my_strcat(map_name, "_destructible.csv"), 2); // Layer 2 = destructible objects;
+  load_map(game, my_strcat(map_name, "_air.csv"), 3); // Layer 3 = air;
+}
+
+t_player	*init_player_position(t_player *player)
+{
+  player->position->pos = malloc(sizeof(SDL_Rect) + 1);
+  player->position->pos->w = 36 * SCALE;
+  player->position->pos->h = 54 * SCALE;
+  player->position->hitbox = malloc(sizeof(SDL_Rect) + 1);
+  player->position->xvel = 0;
+  player->position->yvel = 0;
+  //SPRITE HITBOXES
+  player->position->hitbox->w = 26 * SCALE;
+  player->position->hitbox->h = 20 * SCALE;
+  player->position->last_dir = 1;
+  player->last_anim_dir = 2;
+  switch (player->id)
+    {
+    case 1:
+      player->position->pos->x = MAP_MARGIN_X;
+      player->position->pos->y = MAP_MARGIN_Y - player->position->hitbox->h;
+      player->position->dir = 2;
+      break;
+    case 2 :
+      player->position->pos->x = MAP_MARGIN_X + ((12 * 32) * SCALE);
+      player->position->pos->y = MAP_MARGIN_Y - player->position->hitbox->h;
+      player->position->dir = 2;
+      break;
+    case 3 :
+      player->position->pos->x = MAP_MARGIN_X;
+      player->position->pos->y = MAP_MARGIN_Y + ((12 * 32) * SCALE) - player->position->hitbox->h;
+      player->position->dir = 2;
+      break;
+    case 4:
+      player->position->pos->x = MAP_MARGIN_X + ((12 * 32) * SCALE);
+      player->position->pos->y = MAP_MARGIN_Y + ((12 * 32) * SCALE) - player->position->hitbox->h;
+      player->position->dir = 2;
+      break;
+    default:
+      player->position->pos->x = MAP_MARGIN_X;
+      player->position->pos->y = MAP_MARGIN_Y - player->position->hitbox->h;
+      player->position->dir = 2;
+      break;
+    }
+  return player;
+}
+
+void	init_player(t_game *game)
+{
+  int	i;
+  
+  if (game->players == NULL)
+    {
+      /*game->ground_objects = (t_non_solid_object **)malloc(sizeof(t_non_solid_object) * 230 + 1);
+      for (int j = 0; j < 230; j++)
+	game->ground_objects[j] = NULL;
+      game->solid_objects = (t_solid_object **)malloc(sizeof(t_solid_object) * 230 + 1);
+      for (int j = 0; j < 230; j++)
+	game->solid_objects[j] = NULL;
+      game->destructible_objects = (t_solid_object **)malloc(sizeof(t_solid_object) * 230 + 1);
+      for (int j = 0; j < 230; j++)
+	game->destructible_objects[j] = NULL;
+      game->air_objects = (t_non_solid_object **)malloc(sizeof(t_non_solid_object) * 230 + 1);
+      for (int j = 0; j < 230; j++)
+	game->air_objects[j] = NULL;*/
+      game->players = (t_player **)malloc(sizeof(t_player) * 5 + 1);
+      for (int j = 0; j < 5; j++)
+	game->players[j] = NULL;
+      /*game->bombs = (t_bomb **)malloc(sizeof(t_bomb) * 20 + 1);
+      for (int j = 0; j < 20; j++)
+	game->bombs[j] = NULL;
+      game->flames = (t_flame **)malloc(sizeof(t_flame) * 80 + 1);
+      for (int j = 0; j < 80; j++)
+	game->flames[j] = NULL;*/
+    }
+  for (i = 0; game->players[i] != NULL; i++);
+  game->players[i] = (t_player *)malloc(sizeof(t_player) + 1);
+  game->players[i]->id = i + 1;
+  my_putstr("Player ");
+  my_put_nbr(game->players[i]->id);
+  my_putstr(" created\n");
+  game->players[i]->sprite =  IMG_Load("./images/bombermenSpritesheet.png");
+  game->players[i]->sprite_tex = SDL_CreateTextureFromSurface(game->screen, game->players[i]->sprite);
+  game->players[i]->anim_rect = malloc(sizeof(SDL_Rect) + 1);
+  game->players[i]->walking = 0;
+  game->players[i]->nb_bombs = 3;
+  game->players[i]->actual_bombs = 0;
+  game->players[i]->throw_range = 5;
+  game->players[i]->anim_rect->x = 36 * SCALE;
+  game->players[i]->anim_rect->y = 0 + (i * 54);
+  game->players[i]->anim_rect->w = 36 * SCALE;
+  game->players[i]->anim_rect->h = 54 * SCALE;
+  game->players[i]->anim_index = 0;
+  game->players[i]->anim_tick = 0;
+  game->players[i]->anim_duration = ANIM_SPEED;
+  game->players[i]->position = malloc(sizeof(t_position) + 1);
+  game->players[i] = init_player_position(game->players[i]);
+  game->players[i]->position->last_x = game->players[i]->position->pos->x;
+  game->players[i]->position->last_y = game->players[i]->position->pos->y;
+}

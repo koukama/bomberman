@@ -1,0 +1,69 @@
+/*
+** main.c for ftl in /home/infitek/Documents/Etna/My_FTL/reboul_s
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Fri Nov 10 13:12:28 2017 REBOUL Simon
+** Last update Tue May 29 16:27:29 2018 REBOUL Simon
+*/
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include "bomberman.h"
+#include "functions.h"
+
+int		main()
+{
+  t_game	game = {0};
+  int	        run;
+  SDL_Event	event;
+  const int	FPS = 60;
+  const int	frameDelay = 1000 / FPS;
+  Uint32	frameStart;
+  int		frameTime;
+
+  event.type = 0;
+  run = 1;
+  srand(time(NULL));
+  game.container = NULL;
+  game.players = NULL;
+  game.screen = init_SDL(&game);
+  //game = init_graphics(game);
+  init_game(&game);
+  Mix_PlayMusic(game.audio->music, -1);
+  while (run == 1)
+  {
+    frameStart = SDL_GetTicks();
+    
+    gere_gameplay(&game, event);
+    gere_display(&game);
+    SDL_RenderPresent(game.screen);
+    SDL_RenderClear(game.screen);
+    SDL_PollEvent(&event);
+    switch(event.type)
+	{
+	case SDL_QUIT:
+	  run = 0;
+	  break;
+    	}
+    frameTime = SDL_GetTicks() - frameStart;
+
+    if (frameDelay > frameTime)
+      SDL_Delay(frameDelay - frameTime);
+  }
+  
+  //if (game != NULL)
+  //free(game);
+  Mix_FreeMusic(game.audio->music);
+  Mix_CloseAudio();
+  //TTF_CloseFont(game->police); 
+  TTF_Quit();
+  SDL_Quit();
+  return EXIT_SUCCESS;
+}

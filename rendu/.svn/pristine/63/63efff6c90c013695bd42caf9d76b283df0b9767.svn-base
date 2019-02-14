@@ -1,0 +1,195 @@
+/*
+** bomberman.h for bomberman in /home/infitek/Documents/Etna/Bomberman
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Fri May  4 16:40:03 2018 REBOUL Simon
+** Last update Fri May 25 20:44:47 2018 REBOUL Simon
+*/
+
+#ifndef __BOMBERMAN_H__
+# define __BOMBERMAN_H__
+# define SCREEN_W	480
+# define SCREEN_H	480 
+# define MAP_MARGIN_X	32
+# define MAP_MARGIN_Y	32 
+# define TILE_SIZE	32
+# define ANIM_SPEED	10
+# define WALK_SPEED     2
+# define SCALE		1
+# define EMPTY_TILE_INDEX 329
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
+
+typedef struct	s_game		t_game;
+typedef struct	s_player	t_player;
+typedef struct	s_position	t_position;
+typedef struct	s_container	t_container;
+typedef struct	s_object	t_object;
+typedef struct	s_solid_object	t_solid_object;
+typedef struct	s_non_solid_object t_non_solid_object;
+typedef struct	s_bomb		t_bomb;
+typedef	struct	s_flame		t_flame;
+typedef struct	s_audio		t_audio;
+
+struct	s_game
+{
+  SDL_Surface	*flames_sprite;
+  SDL_Texture	*flames_tex;
+  SDL_Surface	*background;
+  SDL_Texture	*background_tex;
+  SDL_Renderer	*screen;
+  SDL_Window	*window;
+  SDL_Surface	*tileset;
+  SDL_Texture	*tileset_tex;
+  TTF_Font	*police;
+  SDL_Surface	*text;
+  SDL_Texture	*text_tex;
+  SDL_Rect	text_pos;
+  Uint32	time_count;
+  SDL_Texture	*win;
+  SDL_Texture	*lose;
+  int		has_win;
+  t_container		*container;
+  t_player		**players;
+  t_audio	*audio;
+};
+
+struct s_audio
+{
+  Mix_Music	*music;
+  Mix_Chunk	*dropBomb;
+  Mix_Chunk	*bombExplode;
+};
+
+struct	s_player
+{
+  int		id;
+  SDL_Surface	*sprite;
+  SDL_Texture	*sprite_tex;
+  int		walking;
+  SDL_Rect	*anim_rect;
+  int		anim_tick;
+  int		anim_duration;
+  int		anim_index;
+  int		anim_forward;
+  int		last_anim_dir;
+  int		speed;
+  int		nb_bombs;
+  int		actual_bombs;
+  int		throw_range;
+  t_position	*position;
+};
+
+struct s_position
+{
+  SDL_Rect	*pos;
+  int		last_x;
+  int		last_y;
+  SDL_Rect	*hitbox;
+  int		xvel;
+  int		yvel;
+  int		dir; // As the numpad : 1 = left, 2 = down, 3 = right, 5 = up
+  int		last_dir;
+};
+
+struct s_container
+{
+  int		nb_elems;
+  t_object	*first;
+  t_object	*last;
+};
+
+struct s_object
+{
+  SDL_Surface	*sprite;
+  SDL_Texture	*sprite_tex;
+  SDL_Rect	*tile_rect;
+  SDL_Rect	*hitbox;
+  char		*name;
+  int		id;
+  int		dir; // As the numpad : 1 = left, 2 = down, 3 = right, 5 = up
+  t_object	*next;
+  t_object	*prev;
+  int		is_solid;
+  int		is_destructible;
+  int		is_destruction_effect;
+  int		is_over_player;
+  int		is_damaging;
+  int		is_animated;
+  int		is_bomb;
+  int		is_flame;
+  int		is_gonna_disappear;
+  SDL_Rect	*anim_rect;
+  int		anim_tick;
+  int		anim_duration;
+  int		anim_index;
+  int		anim_forward;
+  int		timer;
+  int		range;
+  int		flame_dir;
+  int		distance_from_origin;
+  int		bomb_range;
+  int		owned_by;
+  t_object	*parent;
+};
+
+/*struct s_solid_object
+{
+  SDL_Surface	*sprite;
+  SDL_Texture	*sprite_tex;
+  SDL_Rect	*tile_rect;
+  SDL_Rect	*hitbox;
+  int		id;
+  int		dir; // As the numpad : 1 = left, 2 = down, 3 = right, 5 = up
+  int		last_dir;
+};
+
+struct s_non_solid_object
+{
+  SDL_Surface	*sprite;
+  SDL_Texture	*sprite_tex;
+  SDL_Rect	*tile_rect;
+  SDL_Rect	*hitbox;
+  int		id;
+};
+
+struct s_bomb
+{
+  SDL_Texture	*sprite_tex;
+  SDL_Surface	*sprite;
+  SDL_Rect	*tile_rect;
+  SDL_Rect	*hitbox;
+  SDL_Rect	*anim_rect;
+  int		anim_tick;
+  int		anim_duration;
+  int		anim_index;
+  int		anim_forward;
+  int		id;
+  int		timer;
+  int		range;
+};
+
+struct s_flame
+{
+  SDL_Surface	*sprite;
+  SDL_Texture	*sprite_tex;
+  SDL_Rect	*tile_rect;
+  SDL_Rect	*hitbox;
+  SDL_Rect	*anim_rect;
+  int		flame_dir;
+  int		distance_from_origin;
+  int		bomb_range;
+  int		timer;
+  int		anim_tick;
+  int		anim_duration;
+  int		anim_index;
+  int		anim_forward;
+  int		id;
+  };*/
+  
+#endif /*__BOMBERMAN_H__*/

@@ -1,0 +1,36 @@
+/*
+** my_put_nbr.c for my_put_nbr in /home/infitek/Documents/Etna/C/Jour05-06/reboul_s/my_put_nbr
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Wed Oct  4 10:18:30 2017 REBOUL Simon
+** Last update Wed Oct  4 11:29:20 2017 REBOUL Simon
+*/
+#include <unistd.h>
+#include "../headers/functions.h"
+
+void	my_putchar(char c);
+
+void	my_put_nbr(int n)
+{
+  int	mod;
+
+  if (n < 0)
+    {
+      my_putchar('-');
+      n *= -1;
+    }
+  if (n >=0)
+    {
+      if (n >= 10)
+	{
+	  mod = (n % 10);
+	  n = (n - mod) / 10;
+	  my_put_nbr(n);
+	  my_putchar(48 + mod);
+	}
+      else
+	my_putchar(48 + n % 10);
+    }
+}

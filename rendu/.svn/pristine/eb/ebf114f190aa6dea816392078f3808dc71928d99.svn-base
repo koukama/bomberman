@@ -1,0 +1,171 @@
+/*
+** load_map.c for bomberman in /home/infitek/Documents/Etna/Bomberman
+** 
+** Made by REBOUL Simon
+** Login   <reboul_s@etna-alternance.net>
+** 
+** Started on  Mon May 14 16:45:24 2018 REBOUL Simon
+** Last update Fri May 25 11:45:44 2018 REBOUL Simon
+*/
+
+#include <unistd.h>
+#include <stdio.h>
+#include "bomberman.h"
+#include "functions.h"
+
+void  load_map(t_game *game, char* path, int layer)
+{
+  FILE *stream = fopen(path, "r");
+  int c;
+  int x = 0;
+  int y = 0;
+
+  if (stream)
+    {
+      int index_tile = 0;
+      while ((c = getc(stream)) != EOF)
+	{
+	  
+	  if (c != ',' && c != '\n')
+	    {
+	      if (index_tile == 0)
+		  index_tile = c - 48;
+	      else
+		{
+		  index_tile *= 10;
+		  index_tile += (c - 48);
+		}
+	    }
+	  else
+	    {
+	      if (index_tile != EMPTY_TILE_INDEX && index_tile >= 0)
+		add_object(game, index_tile, x, y, layer);
+	      index_tile = 0;
+	      if (c == ',')
+		++x;
+	      else if (c == '\n')
+		{
+		  ++y;
+		  x = 0;
+		}
+	    }
+	}
+      fclose(stream);
+    }
+}
+
+void	add_objects(t_game *game, int index_tile, int x, int y, int layer)
+{
+  /*switch (layer)
+    {
+    case 0:
+      add_object(game, index_tile, x, y, 0, 0);
+      break;
+    case 1:
+      add_object(game, index_tile, x, y, 1, 1);
+      break;
+    case 2:
+      add_object(game, index_tile, x, y, 1, 0);
+      break;
+    case 3:*/
+      add_object(game, index_tile, x, y, layer);
+      //break;
+      //}
+}
+
+void	add_object(t_game *game, int index_tile, int x, int y, int layer)
+{
+  t_object	*obj;;
+
+  obj = malloc(sizeof(t_object) + 1);
+  obj->sprite = malloc(sizeof(SDL_Surface) + 1);
+  obj->sprite = game->tileset;
+  obj->sprite_tex = SDL_CreateTextureFromSurface(game->screen, obj->sprite);
+  obj->tile_rect = malloc(sizeof(SDL_Rect) + 1);
+  obj->tile_rect->x= get_x_pos(41 * TILE_SIZE, 11 * TILE_SIZE, TILE_SIZE, index_tile) + TILE_SIZE;
+  obj->tile_rect->y = get_y_pos(41 * TILE_SIZE, 11 * TILE_SIZE, TILE_SIZE, index_tile) + TILE_SIZE;
+  obj->tile_rect->w = MAP_MARGIN_X;
+  obj->tile_rect->h = MAP_MARGIN_Y;
+  obj->hitbox = malloc(sizeof(SDL_Rect) + 1);
+  obj->hitbox->x = x * MAP_MARGIN_X;
+  obj->hitbox->y = y * MAP_MARGIN_Y;
+  obj->hitbox->w = MAP_MARGIN_X;
+  obj->hitbox->h = MAP_MARGIN_Y;
+  obj->id = game->container->nb_elems;
+  obj->is_bomb = 0;
+  obj->is_flame = 0;
+  if (layer > 0 && layer < 3)
+    obj->is_solid = 1;
+  else
+    obj->is_solid = 0;
+  if (layer == 3)
+    obj->is_over_player = 1;
+  else
+    obj->is_over_player = 0;
+  obj->prev = NULL;
+  obj->next = NULL;
+  obj->parent = NULL;
+  add_object_to_container(game, obj);
+}
+
+/*void	add_solid_object(t_game *game, int index_tile, int x, int y, int destructible)
+{
+  t_solid_object	*obj;
+  int			i;
+
+  obj = malloc(sizeof(t_solid_object) + 1);
+  obj->sprite = malloc(sizeof(SDL_Surface) + 1);
+  obj->sprite = game->tileset;
+  obj->sprite_tex = SDL_CreateTextureFromSurface(game->screen, obj->sprite);
+  obj->tile_rect = malloc(sizeof(SDL_Rect) + 1);
+  obj->tile_rect->x= get_x_pos(41 * TILE_SIZE, 11 * TILE_SIZE, TILE_SIZE, index_tile) + TILE_SIZE;//(index_tile / 40 * MAP_MARGIN_X);
+  obj->tile_rect->y = get_y_pos(41 * TILE_SIZE, 11 * TILE_SIZE, TILE_SIZE, index_tile) + TILE_SIZE;//(index_tile % 11 * MAP_MARGIN_Y);
+  obj->tile_rect->w = MAP_MARGIN_X;
+  obj->tile_rect->h = MAP_MARGIN_Y;
+  obj->hitbox = malloc(sizeof(SDL_Rect) + 1);
+  obj->hitbox->x = x * MAP_MARGIN_X;
+  obj->hitbox->y = y * MAP_MARGIN_Y;
+  obj->hitbox->w = MAP_MARGIN_X;
+  obj->hitbox->h = MAP_MARGIN_Y;
+  obj->dir = 2;
+  obj->last_dir = 2;
+  if (destructible == 0)
+    {
+      for (i = 0; game->solid_objects[i]; i++);
+      obj->id = i;
+      game->solid_objects[i] = (t_solid_object *)malloc(sizeof(t_solid_object) + 1);
+      game->solid_objects[i] = obj;
+    }
+  else
+    {
+      for (i = 0; game->destructible_objects[i]; i++);
+      obj->id = i;
+      game->destructible_objects[i] = (t_solid_object *)malloc(sizeof(t_solid_object) + 1);
+      game->destructible_objects[i] = obj;
+    }
+}*/
+
+
+int get_x_pos(int width, int height, int tilesize, int tilenumber)
+{
+  if ((tilenumber % (width / tilesize) - 1) < 0)
+    return width - tilesize;
+  return (tilenumber % (width / tilesize) - 1) * tilesize;
+}
+
+int get_y_pos(int width, int height, int tilesize, int tilenumber)
+{
+    return (my_ceil(tilenumber / (width / tilesize)) - 1) * tilesize;
+}
+
+int my_ceil(double x)
+{
+    int rtn = x;
+ 
+    x -= rtn;
+ 
+    if(x != 0)
+        rtn++;
+ 
+    return (int)rtn;
+}

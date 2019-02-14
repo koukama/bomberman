@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="15" height="15" tilewidth="64" tileheight="64" nextobjectid="1">
+ <tileset firstgid="1" name="tiles2" tilewidth="64" tileheight="64" tilecount="451">
+  <image source="../../images/tiles2.png" trans="ff00ff" width="2624" height="704"/>
+ </tileset>
+ <layer name="sol" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJyLZWBgiCMDxwNxGxA3YsHhOMRhuAOql5A6fHpJ1TcU9YZj0UtKmA0H/5JjL7XTFTHpeT0QbyADbwRiALKwcYw=
+  </data>
+ </layer>
+ <layer name="solid" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBhcIBaI44A4ngy9bVC6gwi1tUBch8RfD6U34lFDDUDIf/jk27CIYQPY/A/y3wYGVP+RIk8tEAulByJ+0f1Hi/glBwAA9+4SsQ==
+  </data>
+ </layer>
+ <layer name="destructible" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJytUssKACAM2ofvsE+vSyCitShhxB5OqSLekTMKAoH1FNyKHlf1WJ/7Sbnj3tTX3hK5qzswT92P86B0eeaXrprfnewT/aI3/jfOs+rt5pV/xOldcL/T7Wh3MQA3Hy8R
+  </data>
+ </layer>
+ <layer name="air" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBhYoA3EOmSqCQHiUAJ6iVEzCmgHRuOXMAAAZW0EAQ==
+  </data>
+ </layer>
+</map>
